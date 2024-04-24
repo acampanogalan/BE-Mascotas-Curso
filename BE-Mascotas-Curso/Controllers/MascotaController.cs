@@ -21,6 +21,7 @@ namespace BE_Mascotas_Curso.Controllers
         {
             try
             {
+                Thread.Sleep(2000);
                 var mascotas = await _context.Mascotas.ToListAsync();
                 return Ok(mascotas);
             }
