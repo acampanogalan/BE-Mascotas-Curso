@@ -60,9 +60,24 @@ namespace BE_Mascotas_Curso.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            return Ok($"DELETE Mascota {id}");
+            try
+            {
+                var mascota = await _context.Mascotas.FindAsync(id);
+
+                if (mascota == null)
+                    return NotFound();
+
+                _context.Mascotas.Remove(mascota);
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
