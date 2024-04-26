@@ -17,7 +17,7 @@ namespace BE_Mascotas_Curso.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Mascota>>> GetMascotas()
+        public async Task<IActionResult> GetMascotas()
         {
             try
             {
@@ -31,7 +31,7 @@ namespace BE_Mascotas_Curso.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
             try
             {
@@ -48,9 +48,23 @@ namespace BE_Mascotas_Curso.Controllers
         }
 
         [HttpPost]
-        public IActionResult Post()
+        public async Task<IActionResult> Post(Mascota mascota)
         {
-            return Ok("POST Mascota");
+            try
+            {
+
+                mascota.FechaCreacion = DateTime.Now;
+                
+                _context.Add(mascota);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction("Get", new { id = mascota.Id }, mascota);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut("{id}")]
