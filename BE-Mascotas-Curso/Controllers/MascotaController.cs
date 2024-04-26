@@ -21,7 +21,6 @@ namespace BE_Mascotas_Curso.Controllers
         {
             try
             {
-                Thread.Sleep(2000);
                 var mascotas = await _context.Mascotas.ToListAsync();
                 return Ok(mascotas);
             }
@@ -32,9 +31,20 @@ namespace BE_Mascotas_Curso.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<ActionResult> Get(int id)
         {
-            return Ok($"GET Mascota {id}");
+            try
+            {
+                var mascota = await _context.Mascotas.FindAsync(id);
+
+                if (mascota == null)
+                    return NotFound();
+                return Ok(mascota);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
