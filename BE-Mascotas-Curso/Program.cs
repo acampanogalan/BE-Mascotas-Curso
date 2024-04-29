@@ -1,4 +1,5 @@
 using BE_Mascotas_Curso.Models;
+using BE_Mascotas_Curso.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,6 +34,10 @@ builder.Services.AddDbContext<AplicationDbContext>(options =>
 
 //AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
+
+
+//Repositories
+builder.Services.AddScoped<IMascotaRepository, MascotaRepository>();
 
 
 var app = builder.Build();

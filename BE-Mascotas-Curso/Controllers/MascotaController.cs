@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BE_Mascotas_Curso.Models;
+using BE_Mascotas_Curso.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,13 +11,14 @@ namespace BE_Mascotas_Curso.Controllers
     [ApiController]
     public class MascotaController : ControllerBase
     {
-        private readonly AplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IMascotaRepository _mascotaRepository;
 
-        public MascotaController(AplicationDbContext context, IMapper mapper)
+        public MascotaController(IMapper mapper, IMascotaRepository 
+            mascotaRepository)
         {
-            _context = context;
             _mapper = mapper;
+            _mascotaRepository = mascotaRepository;
         }
 
         [HttpGet]
@@ -24,7 +26,7 @@ namespace BE_Mascotas_Curso.Controllers
         {
             try
             {
-                var mascotas = await _context.Mascotas.ToListAsync();
+                var mascotas = await _mascotaRepository.GetListMascotas();
 
                 var mascotasDto = _mapper.Map<IEnumerable<MascotaDTO>>(mascotas);
 
@@ -41,7 +43,8 @@ namespace BE_Mascotas_Curso.Controllers
         {
             try
             {
-                var mascota = await _context.Mascotas.FindAsync(id);
+
+                var mascota = await _mascotaRepository.GetMascota(id);
 
                 if (mascota == null)
                     return NotFound();
@@ -64,9 +67,8 @@ namespace BE_Mascotas_Curso.Controllers
                 var mascota = _mapper.Map<Mascota>(mascotaDto);
 
                 mascota.FechaCreacion = DateTime.Now;
-                
-                _context.Add(mascota);
-                await _context.SaveChangesAsync();
+
+                await _mascotaRepository.AddMascota(mascota);
 
                 var mascotaItemDto = _mapper.Map<MascotaDTO>(mascota);
                 return CreatedAtAction("Get", new { id = mascota.Id }, mascotaItemDto);
@@ -88,18 +90,12 @@ namespace BE_Mascotas_Curso.Controllers
                 if (id != mascota.Id)
                     return BadRequest();
 
-                var mascotaItem = await _context.Mascotas.FindAsync(id);
+                var mascotaItem = await _mascotaRepository.GetMascota(id);
 
                 if (mascotaItem == null)
                     return NotFound();
 
-                mascotaItem.Nombre = mascota.Nombre;
-                mascotaItem.Edad = mascota.Edad;
-                mascotaItem.Color = mascota.Color;
-                mascotaItem.Raza = mascota.Raza;
-                mascotaItem.Peso = mascota.Peso;
-
-                await _context.SaveChangesAsync();
+                await _mascotaRepository.UpdateMascota(mascota);
 
                 return NoContent();
             }
@@ -114,13 +110,12 @@ namespace BE_Mascotas_Curso.Controllers
         {
             try
             {
-                var mascota = await _context.Mascotas.FindAsync(id);
+                var mascota = await _mascotaRepository.GetMascota(id);
 
                 if (mascota == null)
                     return NotFound();
 
-                _context.Mascotas.Remove(mascota);
-                await _context.SaveChangesAsync();
+                await _mascotaRepository.DeleteMascota(mascota);
 
                 return NoContent();
             }
