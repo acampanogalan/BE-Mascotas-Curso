@@ -68,9 +68,32 @@ namespace BE_Mascotas_Curso.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Put(int id)
+        public async Task<IActionResult> Put(int id, Mascota mascota)
         {
-            return Ok($"PUT Mascota {id}");
+            try
+            {
+                if (id != mascota.Id)
+                    return BadRequest();
+
+                var mascotaItem = await _context.Mascotas.FindAsync(id);
+
+                if (mascotaItem == null)
+                    return NotFound();
+
+                mascotaItem.Nombre = mascota.Nombre;
+                mascotaItem.Edad = mascota.Edad;
+                mascotaItem.Color = mascota.Color;
+                mascotaItem.Raza = mascota.Raza;
+                mascotaItem.Peso = mascota.Peso;
+
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]
