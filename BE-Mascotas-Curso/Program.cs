@@ -31,6 +31,10 @@ builder.Services.AddDbContext<AplicationDbContext>(options =>
 // Add services to the container.
 
 
+//AutoMapper
+builder.Services.AddAutoMapper(typeof(Program));
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
